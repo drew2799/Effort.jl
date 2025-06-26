@@ -333,11 +333,11 @@ function load_multipole_noise_emulator(path; emu=SimpleChainsEmulator,
         k_file=k_file, weights_file=weights_file, inminmax_file=inminmax_file,
         outminmax_file=outminmax_file, nn_setup_file=nn_setup_file)
 
-    Plemulator = PℓEmulator(P11=P11, Ploop=Ploop, Pct=Pct)
+    Plemulator = PℓEmulator(P11=P11, Ploop=Ploop, Pct=Pct, BiasContraction=biascontraction)
 
     NoiseEmulator = load_component_emulator(path * "st/", Effort.NoiseEmulator; emu=emu,
         k_file=k_file, weights_file=weights_file, inminmax_file=inminmax_file,
         outminmax_file=outminmax_file, nn_setup_file=nn_setup_file)
 
-    return PℓNoiseEmulator(Pℓ=Plemulator, Noise=NoiseEmulator, BiasContraction=biascontraction)
+    return PℓNoiseEmulator(Pℓ=Plemulator, Noise=NoiseEmulator)
 end
