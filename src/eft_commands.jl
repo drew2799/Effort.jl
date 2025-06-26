@@ -21,7 +21,7 @@ function get_Pℓ(cosmology::Array, D, bs::Array, cosmoemu::PℓNoiseEmulator)
     sn_comp_array = get_component(cosmology, D, cosmoemu.Noise)
     stacked_array = hcat(P11_comp_array, Ploop_comp_array, Pct_comp_array, sn_comp_array)
 
-    return cosmoemu.BiasContraction(bs, stacked_array)
+    return cosmoemu.Pℓ.BiasContraction(bs, stacked_array)
 end
 
 function get_stoch_terms(cϵ0, cϵ1, cϵ2, n_bar, k_grid::Array; k_nl=0.7)
