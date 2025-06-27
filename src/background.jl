@@ -750,18 +750,13 @@ function _r̃_z(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     return dot(weigths_array, integrand_array)
 end
 function _r̃s_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
-    z_array, weigths_array = _transformed_weights(FastGaussQuadrature.gausslegendre, 9, 0, z)
-    R_z = (3.0328e4)*ωb0 ./ (1 .+ z_array)
+    z_array, weigths_array = FastGaussQuadrature.gausslaguerre(16)
+    reparam_z_array = z_array .+ z
+    R_z = (3.0328e4)*ωb0 ./ (1 .+ reparam_z_array)
     fac_R_z = 1 ./ sqrt.(3 .* (1 .+ R_z))
-    integrand_array = fac_R_z ./ _E_a(_a_z(z_array), Ωcb0, h; mν=mν, w0=w0, wa=wa)
-    I1 = dot(weigths_array, integrand_array)
-    
-    z_array, weigths_array = FastGaussQuadrature.gausslaguerre(9)
-    R_z = (3.0328e4)*ωb0 ./ (1 .+ z_array)
-    fac_R_z = 1 ./ sqrt.(3 .* (1 .+ R_z))
-    integrand_array = fac_R_z ./ _E_a(_a_z(z_array), Ωcb0, h; mν=mν, w0=w0, wa=wa)
-    I2 = dot(weigths_array, exp.(z_array) .* integrand_array)
-    return I2-I1
+    integrand_array = fac_R_z ./ _E_a(_a_z(reparam_z_array), Ωcb0, h; mν=mν, w0=w0, wa=wa)
+    I = dot(weigths_array, exp.(z_array) .* integrand_array)
+    return I
 end
 
 """
