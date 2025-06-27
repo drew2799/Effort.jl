@@ -697,7 +697,7 @@ end
 function _r̃s_z_check(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     p = [Ωcb0, h, mν, w0, wa, ωb0]
     f(x, p) = (1/sqrt(3*(1+((3.0328e4)*p[6]/(1+x))))) / _E_a(_a_z(x), p[1], p[2]; mν=p[3], w0=p[4], wa=p[5])
-    domain = (z, convert(typeof(z), 10_000)) # (lb, ub)
+    domain = (z, convert(typeof(z), 1.0e7)) # (lb, ub)
     prob = IntegralProblem(f, domain, p; reltol=1e-10)
     sol = solve(prob, QuadGKJL())[1]
     return sol
@@ -750,7 +750,7 @@ function _r̃_z(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     return dot(weigths_array, integrand_array)
 end
 function _r̃s_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
-    z_array, weigths_array = _transformed_weights(FastGaussQuadrature.gausslegendre, 9, z, 10_000)
+    z_array, weigths_array = _transformed_weights(FastGaussQuadrature.gausslegendre, 9, z, 1.0e7)
     R_z = (3.0328e4)*ωb0 ./ (1 .+ z_array)
     fac_R_z = 1 ./ sqrt.(3 .* (1 .+ R_z))
     integrand_array = fac_R_z ./ _E_a(_a_z(z_array), Ωcb0, h; mν=mν, w0=w0, wa=wa)
