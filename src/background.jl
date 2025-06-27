@@ -741,6 +741,13 @@ function _r̃_z(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     integrand_array = 1.0 ./ _E_a(_a_z(z_array), Ωcb0, h; mν=mν, w0=w0, wa=wa)
     return dot(weigths_array, integrand_array)
 end
+function _r̃s_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
+    z_array, weigths_array = _transformed_weights(FastGaussQuadrature.gausslegendre, 9, 0, z)
+    R_z = (31.5e3)*ωb0./(1+z)
+    fac_R_z = 1 ./ sqrt.(3 .* (1 .+ R_z))
+    integrand_array = fac_R_z ./ _E_a(_a_z(z_array), Ωcb0, h; mν=mν, w0=w0, wa=wa)
+    return dot(weigths_array, integrand_array)
+end
 
 """
     _r̃_z(z, w0wacosmo::w0waCDMCosmology)
@@ -855,6 +862,9 @@ This function uses `` \\tilde{r}(z) = \\text{_r̃_z}(z, \\dots) ``.
 """
 function _r_z(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     return c_0 * _r̃_z(z, Ωcb0, h; mν=mν, w0=w0, wa=wa) / (100 * h)
+end
+function _rs_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
+    return c_0 * _r̃s_z(z, ωb0, Ωcb0, h; mν=mν, w0=w0, wa=wa) / (100 * h)
 end
 
 """
