@@ -694,6 +694,14 @@ function _r̃_z_check(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     sol = solve(prob, QuadGKJL())[1]
     return sol
 end
+function _r̃_z_check(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
+    p = [Ωcb0, h, mν, w0, wa, ωb0]
+    f(x, p) = (1/sqrt(3*(1+((3.0328e4)*p[6]/(1+x))))) / _E_a(_a_z(x), p[1], p[2]; mν=p[3], w0=p[4], wa=p[5])
+    domain = (z, convert(typeof(z), 5000)) # (lb, ub)
+    prob = IntegralProblem(f, domain, p; reltol=1e-10)
+    sol = solve(prob, QuadGKJL())[1]
+    return sol
+end
 
 """
     _r̃_z(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
@@ -820,6 +828,9 @@ This function uses `` \\tilde{r}(z) = \\text{_r̃_z_check}(z, \\dots) ``.
 """
 function _r_z_check(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     return c_0 * _r̃_z_check(z, Ωcb0, h; mν=mν, w0=w0, wa=wa) / (100 * h)
+end
+function _rs_z_check(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
+    return c_0 * _r̃s_z_check(z, ωb0, Ωcb0, h; mν=mν, w0=w0, wa=wa) / (100 * h)
 end
 
 """
