@@ -750,7 +750,18 @@ function _r̃_z(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     return dot(weigths_array, integrand_array)
 end
 function _r̃s_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0, Tcmb=2.7255, nlag=64)
-    z_array, weigths_array = FastGaussQuadrature.gausslaguerre(nlag)
+    u, w = FastGaussQuadrature.gausslaguerre(nlag)
+    zp = (1 + z) .* exp.(u) .- 1.0
+    a  = _a_z(zp)
+    Ωγ0 = 2.469e-5 / h^2 * (Tcmb/2.7255)^4
+    Ωb0 = ωb0 / h^2
+    R_a = (3.0/4.0) * (Ωb0 / Ωγ0) .* a
+    cs_fac = 1.0 ./ sqrt.(3.0 .* (1 .+ R_a))
+    E_a = _E_a(a, Ωcb0, h; mν=mν, w0=w0, wa=wa)
+    g = (1.0 .+ zp) .* exp.(u) .* (cs_fac ./ E_a)
+    return dot(w, g)
+    
+    #=z_array, weigths_array = FastGaussQuadrature.gausslaguerre(nlag)
     reparam_z_array = z_array .+ z
     #R_z = (3.0328e4)*ωb0 ./ (1 .+ reparam_z_array)
     #fac_R_z = 1 ./ sqrt.(3 .* (1 .+ R_z))
@@ -760,7 +771,7 @@ function _r̃s_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0, Tcmb=2.7255, nlag=
     fac_cs = 1.0 ./ sqrt.(3.0 .* (1 .+ R_a))
     integrand_array = fac_cs ./ _E_a(_a_z(reparam_z_array), Ωcb0, h; mν=mν, w0=w0, wa=wa)
     I = dot(weigths_array, exp.(z_array) .* integrand_array)
-    return I
+    return I=#
 end
 
 """
