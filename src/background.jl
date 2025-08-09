@@ -694,13 +694,21 @@ function _r̃_z_check(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     sol = solve(prob, QuadGKJL())[1]
     return sol
 end
-function _r̃s_z_check(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
-    p = [Ωcb0, h, mν, w0, wa, ωb0]
-    f(x, p) = (1/sqrt(3*(1+((3.0328e4)*p[6]/(1+x))))) / _E_a(_a_z(x), p[1], p[2]; mν=p[3], w0=p[4], wa=p[5])
-    domain = (z, convert(typeof(z), 1.0e7)) # (lb, ub)
-    prob = IntegralProblem(f, domain, p; reltol=1e-10)
-    sol = solve(prob, QuadGKJL())[1]
-    return sol
+function _r̃s_z_check(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0, Tcmb=2.7255, rtol=1e-8)
+    a_star = _a_z(z)
+    H0 = 100.0 * h
+    Ωγ0 = 2.47297532871e-5 / h^2 * (Tcmb/2.7255)^4
+    Ωb0 = ωb0 / h^2
+    coeffR = (3.0/4.0) * (Ωb0 / Ωγ0)
+
+    integrand(a) = ( 1.0 / (a^2 * _E_a(a, Ωcb0, h; mν=mν, w0=w0, wa=wa)) ) /
+                   sqrt(3.0 * (1.0 + coeffR * a))
+
+    val, _ = quadgk(integrand, 0.0, a_star; rtol=rtol)
+    return val
+    #prob = IntegralProblem(f, domain, p; reltol=1e-10)
+    #sol = solve(prob, QuadGKJL())[1]
+    #return sol
 end
 
 """
@@ -753,7 +761,7 @@ function _r̃s_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0, Tcmb=2.7255, nlag=
     u, w = FastGaussQuadrature.gausslaguerre(nlag)
     zp = (1 + z) .* exp.(u) .- 1.0
     a  = _a_z(zp)
-    Ωγ0 = 2.469e-5 / h^2 * (Tcmb/2.7255)^4
+    Ωγ0 = 2.47297532871e-5 / h^2 * (Tcmb/2.7255)^4
     Ωb0 = ωb0 / h^2
     R_a = (3.0/4.0) * (Ωb0 / Ωγ0) .* a
     cs_fac = 1.0 ./ sqrt.(3.0 .* (1 .+ R_a))
@@ -846,8 +854,8 @@ This function uses `` \\tilde{r}(z) = \\text{_r̃_z_check}(z, \\dots) ``.
 function _r_z_check(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     return c_0 * _r̃_z_check(z, Ωcb0, h; mν=mν, w0=w0, wa=wa) / (100 * h)
 end
-function _rs_z_check(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
-    return c_0 * _r̃s_z_check(z, ωb0, Ωcb0, h; mν=mν, w0=w0, wa=wa) / (100 * h)
+function _rs_z_check(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0, Tcmb=2.7255, rtol=1e-8)
+    return c_0 * _r̃s_z_check(z, ωb0, Ωcb0, h; mν=mν, w0=w0, wa=wa, Tcmb=Tcmb, rtol=rtol) / (100 * h)
 end
 
 """
@@ -892,7 +900,7 @@ function _r_z(z, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0)
     return c_0 * _r̃_z(z, Ωcb0, h; mν=mν, w0=w0, wa=wa) / (100 * h)
 end
 function _rs_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0, Tcmb=2.7255, nlag=64)
-    return c_0 * _r̃s_z(z, ωb0, Ωcb0, h; mν=mν, w0=w0, wa=wa) / (100 * h)
+    return c_0 * _r̃s_z(z, ωb0, Ωcb0, h; mν=mν, w0=w0, wa=wa, Tcmb=Tcmb, nlag=nlag) / (100 * h)
 end
 
 """
