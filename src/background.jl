@@ -697,7 +697,7 @@ end
 function _r̃s_z_check(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0, Tcmb=2.7255, rtol=1e-8)
     a_star = _a_z(z)
     H0 = 100.0 * h
-    Ωγ0 = 2.47297532871e-5 / h^2 * (Tcmb/2.7255)^4
+    Ωγ0 = 2.472975e-5 / h^2 * (Tcmb/2.7255)^4
     Ωb0 = ωb0 / h^2
     coeffR = (3.0/4.0) * (Ωb0 / Ωγ0)
 
@@ -761,7 +761,7 @@ function _r̃s_z(z, ωb0, Ωcb0, h; mν=0.0, w0=-1.0, wa=0.0, Tcmb=2.7255, nlag=
     u, w = FastGaussQuadrature.gausslaguerre(nlag)
     zp = (1 + z) .* exp.(u) .- 1.0
     a  = _a_z(zp)
-    Ωγ0 = 2.47297532871e-5 / h^2 * (Tcmb/2.7255)^4
+    Ωγ0 = 2.472975e-5 / h^2 * (Tcmb/2.7255)^4
     Ωb0 = ωb0 / h^2
     R_a = (3.0/4.0) * (Ωb0 / Ωγ0) .* a
     cs_fac = 1.0 ./ sqrt.(3.0 .* (1 .+ R_a))
